@@ -1,0 +1,245 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-07-02 19:58:26.721077",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "posting_date",
+  "employee_rewards",
+  "column_break_vhqeh",
+  "naming_series",
+  "amended_from",
+  "section_break_bcgd8",
+  "employee",
+  "employee_name",
+  "column_break_bitbj",
+  "company",
+  "department",
+  "section_break_2zi1f",
+  "amount",
+  "accounts_section",
+  "reward_type",
+  "expense_account",
+  "column_break_edoh0",
+  "payment_account",
+  "employee_reward_account",
+  "section_break_gcuki",
+  "earning_additional_salary",
+  "column_break_svmgu",
+  "deduction_additional_salary",
+  "accounting_dimensions_section",
+  "project",
+  "column_break_nts0x",
+  "cost_center"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Series",
+   "options": "CASH-RWRDS-.####",
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vhqeh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_bcgd8",
+   "fieldtype": "Section Break",
+   "label": "Employee Details"
+  },
+  {
+   "fetch_from": "employee_rewards.employee",
+   "fetch_if_empty": 1,
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_bitbj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "accounts_section",
+   "fieldtype": "Section Break",
+   "label": "Accounts"
+  },
+  {
+   "fieldname": "reward_type",
+   "fieldtype": "Link",
+   "label": "Reward Type",
+   "options": "Employee Reward Accounts",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "reward_type.expense_account",
+   "fetch_if_empty": 1,
+   "fieldname": "expense_account",
+   "fieldtype": "Link",
+   "label": "Expense Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_edoh0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "reward_type.payment_account",
+   "fetch_if_empty": 1,
+   "fieldname": "payment_account",
+   "fieldtype": "Link",
+   "label": "Payment Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "reward_type.employee_reward_account",
+   "fetch_if_empty": 1,
+   "fieldname": "employee_reward_account",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Employee Reward Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "section_break_gcuki",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "reward_type.earning_additional_salary",
+   "fetch_if_empty": 1,
+   "fieldname": "earning_additional_salary",
+   "fieldtype": "Link",
+   "label": "Earning Additional Salary",
+   "options": "Salary Component",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_svmgu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "reward_type.deduction_additional_salary",
+   "fetch_if_empty": 1,
+   "fieldname": "deduction_additional_salary",
+   "fieldtype": "Link",
+   "label": "Deduction Additional Salary",
+   "options": "Salary Component",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee_rewards.amount",
+   "fetch_if_empty": 1,
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Cash Rewards",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_2zi1f",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "employee_rewards",
+   "fieldtype": "Link",
+   "label": "Employee Rewards",
+   "options": "Employee Rewards",
+   "read_only": 1
+  },
+  {
+   "fieldname": "accounting_dimensions_section",
+   "fieldtype": "Section Break",
+   "label": "Accounting Dimensions"
+  },
+  {
+   "fetch_from": "reward_type.project",
+   "fetch_if_empty": 1,
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_nts0x",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "reward_type.cost_center",
+   "fetch_if_empty": 1,
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-07-09 14:27:20.771962",
+ "modified_by": "Administrator",
+ "module": "Attendance",
+ "name": "Cash Rewards",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

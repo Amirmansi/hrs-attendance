@@ -1,0 +1,128 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "Prompt",
+ "creation": "2023-07-02 19:54:23.444016",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "expense_account",
+  "column_break_4aet5",
+  "payment_account",
+  "employee_reward_account",
+  "section_break_vzteu",
+  "earning_additional_salary",
+  "column_break_re1yn",
+  "deduction_additional_salary",
+  "accounting_dimenesion_section",
+  "project",
+  "column_break_xovja",
+  "cost_center"
+ ],
+ "fields": [
+  {
+   "fieldname": "expense_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Expense Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4aet5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Payment Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_reward_account",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Employee Reward Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "section_break_vzteu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "earning_additional_salary",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Earning Additional Salary",
+   "options": "Salary Component",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_re1yn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "deduction_additional_salary",
+   "fieldtype": "Link",
+   "label": "Deduction Additional Salary",
+   "options": "Salary Component",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "accounting_dimenesion_section",
+   "fieldtype": "Section Break",
+   "label": "Accounting Dimenesion"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_xovja",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-07-09 14:28:41.665985",
+ "modified_by": "Administrator",
+ "module": "Attendance",
+ "name": "Employee Reward Accounts",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
