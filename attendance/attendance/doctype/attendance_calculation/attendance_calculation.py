@@ -17,7 +17,6 @@ from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employe
 from datetime import datetime, timedelta, date, time
 # from erpnext.payroll.doctype.salary_structure_assignment.salary_structure_assignment import get_assigned_salary_structure
 from frappe.utils.data import flt, getdate
-from pandas.core.tools.datetimes import to_time
 
 whitelisted_globals = {
     "int": int,
