@@ -4,7 +4,7 @@
 # import frappe
 from babel.dates import format_date
 from erpnext.setup.doctype.holiday_list.holiday_list import HolidayList
-from erpnext.setup.doctype.leave_application.leave_application import get_leave_balance_on, is_lwp
+from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on, is_lwp
 import frappe
 from frappe import _, has_permission, msgprint, new_doc
 from frappe.model.document import Document
