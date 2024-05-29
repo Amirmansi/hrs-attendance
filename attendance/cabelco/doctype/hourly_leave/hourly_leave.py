@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 from datetime import date, datetime
 from attendance.attendance.doctype.attendance_calculation.attendance_calculation import get_employee_salary
-from erpnext.hr.doctype.leave_application.leave_application import get_leave_balance_on
+from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
 import frappe, erpnext
 from frappe.model.document import Document
 from frappe.utils import dateutils, flt, cstr, nowdate, comma_and
