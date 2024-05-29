@@ -3,8 +3,8 @@
 
 # import frappe
 from babel.dates import format_date
-from erpnext.hr.doctype.holiday_list.holiday_list import HolidayList
-from erpnext.hr.doctype.leave_application.leave_application import get_leave_balance_on, is_lwp
+from erpnext.setup.doctype.holiday_list.holiday_list import HolidayList
+from erpnext.setup.doctype.leave_application.leave_application import get_leave_balance_on, is_lwp
 import frappe
 from frappe import _, has_permission, msgprint, new_doc
 from frappe.model.document import Document
@@ -12,8 +12,8 @@ from dateutil.parser import parse
 # from frappe.query_builder.utils import DocType
 from frappe.sessions import get
 from frappe.utils import to_timedelta, add_days, nowdate, get_link_to_form
-# from erpnext.hr.doctype.shift_assignment.shift_assignment import get_shift_details
-from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee, is_holiday
+# from erpnext.setup.doctype.shift_assignment.shift_assignment import get_shift_details
+from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee, is_holiday
 from datetime import datetime, timedelta, date, time
 # from erpnext.payroll.doctype.salary_structure_assignment.salary_structure_assignment import get_assigned_salary_structure
 from frappe.utils.data import flt, getdate
@@ -45,10 +45,10 @@ class AttendanceCalculation(Document):
         self.payroll_end_date = parse(str(self.payroll_end_date)).date()
 
         if not (self.payroll_start_date <= self.start_date <= self.payroll_end_date):
-            frappe.throw(_("Start Date is Not in Payroll Period Date Range"))
+            frappe.tsetupow(_("Start Date is Not in Payroll Period Date Range"))
 
         if not (self.payroll_start_date <= self.end_date <= self.payroll_end_date):
-            frappe.throw(_("End Date is Not in Payroll Period Date Range"))
+            frappe.tsetupow(_("End Date is Not in Payroll Period Date Range"))
 
     @frappe.whitelist()
     def calculate_attendance(self):
@@ -184,7 +184,7 @@ class AttendanceCalculation(Document):
             employee=employee.name, for_date=day, consider_default_shift=True)
         # frappe.msgprint(str(shift))
         if not shift:
-            frappe.throw(
+            frappe.tsetupow(
                 _(f"Please Assign Shift to Employee {employee.employee_name} for day {day}"))
         holiday = is_holiday(employee=employee.name, date=day)
         doc.holiday = holiday
@@ -631,7 +631,7 @@ class AttendanceCalculation(Document):
                 return doc
             else:
                 link = get_link_to_form("Attendance", doc.name)
-                frappe.throw(_(f"Please delete Attendace {link} First"))
+                frappe.tsetupow(_(f"Please delete Attendace {link} First"))
         else:
             return frappe.new_doc("Attendance")
 
@@ -710,7 +710,7 @@ class AttendanceCalculation(Document):
                     total_hourly_salary = get_employee_salary(
                         employee, self.payroll_effect_date)
                     if not total_hourly_salary:
-                        frappe.throw(
+                        frappe.tsetupow(
                             _(f"Employee {employee.employee_name} has no components Consider in Hour Rate"))
 
                     day_rate = total_hourly_salary / \
@@ -1044,7 +1044,7 @@ class AttendanceCalculation(Document):
 
                 frappe.db.commit()
             except Exception as e:
-                frappe.throw(
+                frappe.tsetupow(
                     _(f"Error While Posting Attendance For Employee {employee.employee_name} <BR/>'{e}'"))
 
             count += 1
@@ -1085,7 +1085,7 @@ class AttendanceCalculation(Document):
             if doc:
                 if doc.salary_slip:
                     lnk = get_link_to_form(doctype, doc.name)
-                    frappe.throw(
+                    frappe.tsetupow(
                         _(f"Can't Cancel Additional Salary {lnk} is assigned to salary slip for employee {employee.employee_name}"))
                 else:
                     doc = frappe.get_doc(doctype, doc.name)
@@ -1093,7 +1093,7 @@ class AttendanceCalculation(Document):
                     doc.delete()
 
             doc = frappe.new_doc(doctype)
-            doc.naming_series = "HR-ADS-.YY.-.MM.-"
+            doc.naming_series = "setup-ADS-.YY.-.MM.-"
             doc.employee = employee.name
             doc.employee_name = employee.employee_name
             doc.department = employee.department
@@ -1417,7 +1417,7 @@ def get_employee_salary(employee, payroll_effect_date):
         for k, v in comp_dict.items():
             print(f"{k} ===> {v}")
     else:
-        frappe.throw(
+        frappe.tsetupow(
             _("Please assign a Salary Structure for Employee {0} "
               "applicable from or before {1} first").format(
                 frappe.bold(employee.employee_name),
