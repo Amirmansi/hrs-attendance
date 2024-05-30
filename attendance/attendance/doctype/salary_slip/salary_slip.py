@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import datetime
 import math
-from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip
+from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
 
 import frappe
 from frappe import _, msgprint
@@ -27,21 +27,21 @@ from six import iteritems
 
 import erpnext
 from erpnext.accounts.utils import get_fiscal_year
-from erpnext.hr.utils import get_holiday_dates_for_employee, validate_active_employee
-from erpnext.loan_management.doctype.loan_repayment.loan_repayment import (
+from hrms.hr.utils import get_holiday_dates_for_employee, validate_active_employee
+from lending.loan_management.doctype.loan_repayment.loan_repayment import (
     calculate_amounts,
     create_repayment_entry,
 )
-from erpnext.payroll.doctype.additional_salary.additional_salary import get_additional_salaries
-from erpnext.payroll.doctype.employee_benefit_application.employee_benefit_application import (
+from hrms.payroll.doctype.additional_salary.additional_salary import get_additional_salaries
+from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
     get_benefit_component_amount,
 )
-from erpnext.payroll.doctype.employee_benefit_claim.employee_benefit_claim import (
+from hrms.payroll.doctype.employee_benefit_claim.employee_benefit_claim import (
     get_benefit_claim_amount,
     get_last_payroll_period_benefits,
 )
-from erpnext.payroll.doctype.payroll_entry.payroll_entry import get_start_end_dates
-from erpnext.payroll.doctype.payroll_period.payroll_period import (
+from hrms.payroll.doctype.payroll_entry.payroll_entry import get_start_end_dates
+from hrms.payroll.doctype.payroll_period.payroll_period import (
     get_payroll_period,
     get_period_factor,
 )
