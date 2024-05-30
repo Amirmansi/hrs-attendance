@@ -8,7 +8,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cstr, formatdate, get_datetime, getdate, nowdate
 
-from erpnext.hr.utils import validate_active_employee
+from erpnext.setup.utils import validate_active_employee
 
 
 class Attendance(Document):
