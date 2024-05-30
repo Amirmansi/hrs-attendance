@@ -16,19 +16,19 @@ from frappe.utils import (
 	nowdate,
 )
 
-from erpnext.hr.doctype.employee.test_employee import make_employee
-from erpnext.hr.doctype.leave_allocation.test_leave_allocation import create_leave_allocation
-from erpnext.hr.doctype.leave_application.leave_application import (
+from erpnext.setup.doctype.employee.test_employee import make_employee
+from hrms.hr.doctype.leave_allocation.test_leave_allocation import create_leave_allocation
+from hrms.hr.doctype.leave_application.leave_application import (
 	LeaveDayBlockedError,
 	NotAnOptionalHoliday,
 	OverlapError,
 	get_leave_balance_on,
 )
-from erpnext.hr.doctype.leave_policy_assignment.leave_policy_assignment import (
+from hrms.hr.doctype.leave_policy_assignment.leave_policy_assignment import (
 	create_assignment_for_multiple_employees,
 )
-from erpnext.hr.doctype.leave_type.test_leave_type import create_leave_type
-from erpnext.payroll.doctype.salary_slip.test_salary_slip import (
+from hrms.hr.doctype.leave_type.test_leave_type import create_leave_type
+from hrms.payroll.doctype.salary_slip.test_salary_slip import (
 	make_holiday_list,
 	make_leave_application,
 )
@@ -542,7 +542,7 @@ class TestLeaveApplication(unittest.TestCase):
 
 		leave_policy_assignments = create_assignment_for_multiple_employees([employee.name], frappe._dict(data))
 
-		from erpnext.hr.utils import allocate_earned_leaves
+		from hrms.hr.utils import allocate_earned_leaves
 		i = 0
 		while(i<14):
 			allocate_earned_leaves(ignore_duplicates=True)
