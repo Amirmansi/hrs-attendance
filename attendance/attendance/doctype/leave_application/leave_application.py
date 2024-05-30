@@ -13,7 +13,7 @@ from frappe.utils import (
 	nowdate,
 )
 
-from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
+from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 
 
 class LeaveDayBlockedError(frappe.ValidationError): pass
@@ -25,7 +25,7 @@ from frappe.model.document import Document
 
 
 
-from erpnext.hr.doctype.leave_application.leave_application import LeaveApplication
+from hrms.hr.doctype.leave_application.leave_application import LeaveApplication
 
 class AttendanceLeaveApplication(LeaveApplication):
 	def update_attendance(self):
@@ -366,7 +366,7 @@ def add_leaves(events, start, end, filter_conditions=None):
 
 def add_block_dates(events, start, end, employee, company):
 	# block days
-	from erpnext.hr.doctype.leave_block_list.leave_block_list import get_applicable_block_dates
+	from hrms.hr.doctype.leave_block_list.leave_block_list import get_applicable_block_dates
 
 	cnt = 0
 	block_dates = get_applicable_block_dates(start, end, employee, company, all_lists=True)
