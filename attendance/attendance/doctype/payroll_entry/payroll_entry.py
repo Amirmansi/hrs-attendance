@@ -6,7 +6,7 @@ import frappe
 from dateutil.relativedelta import relativedelta
 from frappe import _
 from frappe.desk.reportview import get_filters_cond, get_match_cond
-from frappe.model.document import Document
+from frappe.model.document import DocumentAmirmansi/hrs-att
 from frappe.utils import (
 	DATE_FORMAT,
 	add_days,
@@ -674,11 +674,12 @@ def get_payroll_entry_bank_entries(payroll_entry_name):
 
 @frappe.whitelist()
 def payroll_entry_has_bank_entries(name):
-	response = {}
-	bank_entries = get_payroll_entry_bank_entries(name)
-	response['submitted'] = 1 if bank_entries else 0
+    response = {}
+    bank_entries = get_payroll_entry_bank_entries(name)
+    response['has_bank_entries'] = 1 if bank_entries else 0  # Changed key for clarity
 
-	return response
+    return response
+
 
 def create_salary_slips_for_employees(employees, args, publish_progress=True):
 	salary_slips_exists_for = get_existing_salary_slips(employees, args)
