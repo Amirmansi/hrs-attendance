@@ -1,0 +1,68 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-01-08 22:26:11.747064",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_minutes",
+  "to_minutes",
+  "based_on",
+  "deduction_percent",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_minutes",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "From Minutes",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_minutes",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "To Minutes",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "based_on",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Based On",
+   "options": "\nPercent\nStatus",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval: doc.based_on === \"Percent\";",
+   "fieldname": "deduction_percent",
+   "fieldtype": "Percent",
+   "label": "Deduction Percent",
+   "mandatory_depends_on": "eval: doc.based_on === \"Percent\";"
+  },
+  {
+   "depends_on": "eval: doc.based_on === \"Status\";",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "mandatory_depends_on": "eval: doc.based_on === \"Status\";",
+   "options": "\nPresent\nAbsent\nOn Leave\nHalf Day\nWork From Home"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-01-08 22:34:20.598443",
+ "modified_by": "Administrator",
+ "module": "Attendance",
+ "name": "Late Entry Early Exit Child Table",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
