@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:policy_name",
+ "creation": "2025-01-08 22:25:29.946791",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "policy_section",
+  "policy_name",
+  "policy_table"
+ ],
+ "fields": [
+  {
+   "fieldname": "policy_section",
+   "fieldtype": "Section Break",
+   "label": "Policy"
+  },
+  {
+   "fieldname": "policy_table",
+   "fieldtype": "Table",
+   "label": "Policy Table",
+   "options": "Late Entry Early Exit Child Table",
+   "reqd": 1
+  },
+  {
+   "fieldname": "policy_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Policy Name",
+   "reqd": 1,
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-08 22:36:54.549285",
+ "modified_by": "Administrator",
+ "module": "Attendance",
+ "name": "Late Entry Early Exit Table",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
+}

@@ -33,12 +33,12 @@ app_license = "MIT"
 # include js in doctype views
 doctype_js = {
     "Attendance": "attendance/doctype/attendance/attendance.js",
-    "Payroll Entry": "attendance/doctype/payroll_entry/payroll_entry.js"
+    "Payroll Entry": "attendance/doctype/payroll_entry/payroll_entry.js",
 }
-doctype_list_js = {
-    "Attendance": "attendance/doctype/attendance/attendance_list.js"}
+doctype_list_js = {"Attendance": "attendance/doctype/attendance/attendance_list.js"}
 doctype_calendar_js = {
-    "Attendance": "attendance/doctype/attendance/attendance_calender.js"}
+    "Attendance": "attendance/doctype/attendance/attendance_calender.js"
+}
 
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -102,19 +102,17 @@ override_doctype_class = {
     "Payroll Entry": "attendance.attendance.doctype.payroll_entry.attendance_payroll_entry.PayrollEntry",
     "Attendance Request": "attendance.attendance.doctype.attendance_request.attendance_request.AttendanceRequest",
     "Leave Policy Assignment": "attendance.attendance.doctype.leave_policy_assignment.leave_policy_assignment.LeavePolicyAssignment",
-    "Payroll Period": "attendance.attendance.doctype.payroll_period.payroll_period.PayrollPeriod"
+    "Payroll Period": "attendance.attendance.doctype.payroll_period.payroll_period.PayrollPeriod",
 }
 
 
-after_migrate = [
-    "attendance.attendance.setup.after_migrate"]
+after_migrate = ["attendance.attendance.setup.after_migrate"]
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
 doc_events = {
-
     "Leave Application": {
         "before_insert": "attendance.api.before_insert",
         "validate": "attendance.api.validate",
@@ -138,15 +136,17 @@ doc_events = {
     "Stock Entry": {
         "on_submit": "attendance.attendance.doctype.scrub_form.scrub_form.on_submit_stock_entry"
     },
-    "Additional Salary":{
-        "on_trash":"attendance.doc_events.additional_salary.on_trash",
-        "on_cancel":"attendance.doc_events.additional_salary.on_cancel"
+    "Additional Salary": {
+        "on_trash": "attendance.doc_events.additional_salary.on_trash",
+        "on_cancel": "attendance.doc_events.additional_salary.on_cancel",
     },
-    "Payment Entry":{
-        "on_trash":"attendance.doc_events.payment_entry.on_trash",
-        "on_cancel":"attendance.doc_events.payment_entry.on_cancel"
-    }
-
+    "Payment Entry": {
+        "on_trash": "attendance.doc_events.payment_entry.on_trash",
+        "on_cancel": "attendance.doc_events.payment_entry.on_cancel",
+    },
+    "Attendance": {
+        "validate": "attendance.doc_events.attendance.validate",
+    },
 }
 
 # Scheduled Tasks
@@ -168,13 +168,7 @@ scheduler_events = {
     # 	"monthly": [
     # 		"attendance.tasks.monthly"
     # 	]
-    "cron": {
-        "* */1 * * *": [
-            "attendance.api.update_salary_slip_remark"
-        ]
-    }
-
-
+    "cron": {"* */1 * * *": ["attendance.api.update_salary_slip_remark"]},
 }
 
 # Testing
@@ -218,9 +212,7 @@ user_data_fields = [
         "doctype": "{doctype_3}",
         "strict": False,
     },
-    {
-        "doctype": "{doctype_4}"
-    }
+    {"doctype": "{doctype_4}"},
 ]
 
 # Authentication and authorization
