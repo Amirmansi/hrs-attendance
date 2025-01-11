@@ -18,16 +18,24 @@ def validate(doc: AttendanceHRMS, method: str = "") -> None:
     shift_doc = frappe.get_doc("Shift Type", doc.shift)
 
     # If There if only one Checkin or Checkout
-    if (doc.get("in_time") is not None and doc.get("out_time") is None) or (
-        doc.get("in_time") is None and doc.get("out_time") is not None
+    if (
+        doc.get("actual_start_datetime") is not None
+        and doc.get("actual_end_datetime") is None
+    ) or (
+        doc.get("actual_start_datetime") is None
+        and doc.get("actual_end_datetime") is not None
     ):
         if shift_doc.get("custom_consider_only_check_as"):
             doc.set("status", shift_doc.custom_consider_only_check_as)
 
+    # If Both Checkin and Checkout are not present
+    elif not doc.get("actual_start_datetime") and not doc.get("actual_end_datetime"):
+        return
+
     # If Both Checkin and Checkout are present
     else:
-        in_time: datetime = get_datetime(doc.in_time)
-        out_time: datetime = get_datetime(doc.out_time)
+        in_time: datetime = get_datetime(doc.actual_start_datetime)
+        out_time: datetime = get_datetime(doc.actual_end_datetime)
 
         shift_start_time: datetime = datetime.combine(
             in_time.date(), datetime.min.time()
