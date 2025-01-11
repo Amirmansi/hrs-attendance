@@ -1,7 +1,6 @@
 # Copyright (c) 2021, Peter Maged and contributors
 # For license information, please see license.txt
 
-# import frappe
 from babel.dates import format_date
 from erpnext.setup.doctype.holiday_list.holiday_list import HolidayList
 from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on, is_lwp
@@ -9,13 +8,10 @@ import frappe
 from frappe import _, has_permission, msgprint, new_doc
 from frappe.model.document import Document
 from dateutil.parser import parse
-# from frappe.query_builder.utils import DocType
 from frappe.sessions import get
 from frappe.utils import to_timedelta, add_days, nowdate, get_link_to_form
-# from erpnext.setup.doctype.shift_assignment.shift_assignment import get_shift_details
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee, is_holiday
 from datetime import datetime, timedelta, date, time
-# from erpnext.payroll.doctype.salary_structure_assignment.salary_structure_assignment import get_assigned_salary_structure
 from frappe.utils.data import flt, getdate
 
 whitelisted_globals = {
@@ -26,7 +22,6 @@ whitelisted_globals = {
     "date": datetime.date,
     "getdate": getdate
 }
-
 
 class AttendanceCalculation(Document):
     def __init__(self, *args, **kwargs):
@@ -44,10 +39,10 @@ class AttendanceCalculation(Document):
         self.payroll_end_date = parse(str(self.payroll_end_date)).date()
 
         if not (self.payroll_start_date <= self.start_date <= self.payroll_end_date):
-            frappe.tsetupow(_("Start Date is Not in Payroll Period Date Range"))
+            frappe.throw(_("Start Date is Not in Payroll Period Date Range"))
 
         if not (self.payroll_start_date <= self.end_date <= self.payroll_end_date):
-            frappe.tsetupow(_("End Date is Not in Payroll Period Date Range"))
+            frappe.throw(_("End Date is Not in Payroll Period Date Range"))
 
     @frappe.whitelist()
     def calculate_attendance(self):
@@ -58,18 +53,19 @@ class AttendanceCalculation(Document):
         self.payroll_end_date = parse(str(self.payroll_end_date)).date()
         employee_filters = self.get_employees_filters()
         self.employees = frappe.db.sql_list(f"""
-										select emp.name from tabEmployee emp where 1=1
-										{employee_filters}
-										""")
+                                        select emp.name from tabEmployee emp where 1=1
+                                        {employee_filters}
+                                        """)
         frappe.db.sql(f"""
-					delete from tabAttendance where attendance_calculation = '{self.name}' 
-					and attendance_date BETWEEN date('{self.start_date}') and date('{self.end_date}') 
-					and employee in (
-						select name from tabEmployee emp where 1=1
-										{employee_filters}
-					)
-					""")
+                    delete from tabAttendance where attendance_calculation = '{self.name}' 
+                    and attendance_date BETWEEN date('{self.start_date}') and date('{self.end_date}') 
+                    and employee in (
+                        select name from tabEmployee emp where 1=1
+                                        {employee_filters}
+                    )
+                    """)
         frappe.db.commit()
+
         self.employees_logs = frappe.db.sql(f"""
 			select log.employee , time(log.time) as time ,log.time as log_time
 			, date(log.time) as day , log.log_type , log.name as log_name 
@@ -82,67 +78,60 @@ class AttendanceCalculation(Document):
 			order by employee asc , log.time asc
 										""", as_dict=1) or []
         self.permissions = frappe.db.sql(f"""       
-					select permission.name , permission.permission_type 
-					, permission.employee , permission.day , permission.total_minutes 
-					, permission.from_time , permission.to_time
-					from `tabPermission Application` permission
-					inner join tabEmployee emp on permission.employee = emp.name
-					where permission.docstatus = 1 and permission.status='Approved' 
-					and permission.day BETWEEN  date('{self.start_date}')  and date('{self.end_date}')  
-										{employee_filters}
-										""", as_dict=1) or []
-        self.leaves = frappe.db.sql(f"""       
-					select  application.name , application.employee , application.from_date , application.half_day 
-				, ifnull(application.half_day_date,application.from_date) as half_day_date , application.half_day_type 
-					, application.to_date ,application.leave_type from `tabLeave Application` application
-					inner join tabEmployee emp on application.employee = emp.name
-					where application.docstatus = 1 and application.status='Approved'
-					and ((application.from_date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') )  
-					or  (application.to_date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') ) )  
-										{employee_filters}
-										""", as_dict=1) or []
-        # count =1
-        self.overtime_requests = frappe.db.sql(f"""
-			select log.name , log.employee_id as employee , log.date , log.time_from, log.time_to 
-			, log.office , log.outside from `tabDaily Overtime Request` log 
-			inner join tabEmployee emp on emp.name = log.employee_id  
-			where log.approved = 1 and log.docstatus =1 
-			and log.date   BETWEEN date('{self.start_date}') and date('{self.end_date}')   
-							{employee_filters}
-			
-			order by log.employee_id asc  
-											""", as_dict=1) or []
-        self.visits = frappe.db.sql(f"""
-			select log.name , log.employee_name as employee , log.date , log.to_date , log.from_time , log.to_time
-			from `tabVisit Form` log 
-			inner join tabEmployee emp on emp.name = log.employee_name  
-			where log.approved = 1  and log.docstatus =1 
-			# and log.date   BETWEEN date('{self.start_date}') and date('{self.end_date}')  
-			and ((log.date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') )  
-			or  (log.to_date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') ) ) 
-							{employee_filters}
+                    select permission.name , permission.permission_type 
+                    , permission.employee , permission.day , permission.total_minutes 
+                    , permission.from_time , permission.to_time
+                    from `tabPermission Application` permission
+                    inner join tabEmployee emp on permission.employee = emp.name
+                    where permission.docstatus = 1 and permission.status='Approved' 
+                    and permission.day BETWEEN  date('{self.start_date}')  and date('{self.end_date}')  
+                                        {employee_filters}
+                                        """, as_dict=1) or []
 
-			order by log.employee_name asc  
-											""", as_dict=1) or []
+        self.leaves = frappe.db.sql(f"""       
+                    select  application.name , application.employee , application.from_date , application.half_day 
+                , ifnull(application.half_day_date,application.from_date) as half_day_date , application.half_day_type 
+                    , application.to_date ,application.leave_type from `tabLeave Application` application
+                    inner join tabEmployee emp on application.employee = emp.name
+                    where application.docstatus = 1 and application.status='Approved'
+                    and ((application.from_date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') )  
+                    or  (application.to_date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') ) )  
+                                        {employee_filters}
+                                        """, as_dict=1) or []
+
+        self.overtime_requests = frappe.db.sql(f"""
+            select log.name , log.employee_id as employee , log.date , log.time_from, log.time_to 
+            , log.office , log.outside from `tabDaily Overtime Request` log 
+            inner join tabEmployee emp on emp.name = log.employee_id  
+            where log.approved = 1 and log.docstatus =1 
+            and log.date   BETWEEN date('{self.start_date}') and date('{self.end_date}')   
+                            {employee_filters}
+            order by log.employee_id asc  
+                                            """, as_dict=1) or []
+
+        self.visits = frappe.db.sql(f"""
+            select log.name , log.employee_name as employee , log.date , log.to_date , log.from_time , log.to_time
+            from `tabVisit Form` log 
+            inner join tabEmployee emp on emp.name = log.employee_name  
+            where log.approved = 1  and log.docstatus =1 
+            and ((log.date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') )  
+            or  (log.to_date BETWEEN  date('{self.start_date}')  and date('{self.end_date}') ) ) 
+                            {employee_filters}
+            order by log.employee_name asc  
+                                            """, as_dict=1) or []
 
         self.attendance_requests = frappe.db.sql(f"""
-					select log.* from `tabAttendance Request` log
-					inner join tabEmployee emp on emp.name = log.employee
-					where log.docstatus = 1  {employee_filters}
-					
-					and (log.from_date between date('{self.start_date}') and date('{self.end_date}') 
-						or log.to_date between date('{self.start_date}') and date('{self.end_date}') 
-						or (log.from_date < date('{self.start_date}') and log.to_date > date('{self.end_date}')))
-					order by log.employee asc
+                    select log.* from `tabAttendance Request` log
+                    inner join tabEmployee emp on emp.name = log.employee
+                    where log.docstatus = 1  {employee_filters}
+                    and (log.from_date between date('{self.start_date}') and date('{self.end_date}') 
+                        or log.to_date between date('{self.start_date}') and date('{self.end_date}') 
+                        or (log.from_date < date('{self.start_date}') and log.to_date > date('{self.end_date}')))
+                    order by log.employee asc
+                    """, as_dict=1) or []
 
-
-							
-				
-											""", as_dict=1) or []
         for emp in self.employees:
-            # frappe.publish_progress(count*100/len(self.employees), title = _("Submitting Salary Slips..."))
             self.calculate(emp)
-            # count += 1
 
     def calculate(self, emp):
         day = self.start_date
@@ -158,36 +147,25 @@ class AttendanceCalculation(Document):
                                         "total": total,
                                         "message": employee.employee_name + "  " + _("for Day") + "  " + str(day)+"    " + _(f"Calculate {count}/{total} employees"),
                                         "title": _("Attendance Calculation ..."),
-
                                     }), user=frappe.session.user)
-            # frappe.publish_progress(count*100/len(self.employees), title =
-            # _("Attendance Calculation ..."))
             try:
-                # if 1 :
                 self.calculate_day(employee, day, attendance_rule)
             except Exception as e:
                 frappe.msgprint(
                     _(f"Error While Calculate Attendance for Employee {employee.employee_name} at day {day} <br/>{e}"), indicator='red')
             day = add_days(day, 1)
 
-    #    {
-    # 		'shift_type': shift_type,
-    # 		'start_datetime': start_datetime,
-    # 		'end_datetime': end_datetime,
-    # 		'actual_start': actual_start,
-    # 		'actual_end': actual_end
-    # 	}
     def calculate_day(self, employee, day, attendance_rule):
         doc = self.get_attendance(employee.name, day)
         shift = get_employee_shift(
             employee=employee.name, for_date=day, consider_default_shift=True)
-        # frappe.msgprint(str(shift))
+
         if not shift:
-            frappe.tsetupow(
+            frappe.throw(
                 _(f"Please Assign Shift to Employee {employee.employee_name} for day {day}"))
+
         holiday = is_holiday(employee=employee.name, date=day)
         doc.holiday = holiday
-        # frappe.msgprint( shift.shift_type.name)
         doc.employee = employee.name
         doc.employee_doc = employee
         doc.attendance_rule = attendance_rule
@@ -218,10 +196,10 @@ class AttendanceCalculation(Document):
                      and x.employee == doc.employee]
         doc.logs = [x for x in self.employees_logs if shift.actual_start <=
                     x.log_time <= shift.actual_end and x.employee == doc.employee]
-        # print ("attendance_requests ==========================================================================> " , self.attendance_requests)
-        # frappe.msgprint(str(doc.attendance_date))
+
         doc.attendance_requests = [x for x in self.attendance_requests if x.from_date <=
                                    doc.attendance_date <= x.to_date and x.employee == doc.employee]
+
         doc.has_request = 1 if len(doc.attendance_requests) > 0 else 0
         # doc.logs = [x for x in self.employees_logs if  x.day == doc.attendance_date and x.employee == doc.employee]
         # print ("doc.logs => " , doc.logs)
