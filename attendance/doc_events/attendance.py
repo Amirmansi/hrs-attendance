@@ -18,13 +18,7 @@ def validate(doc: AttendanceHRMS, method: str = "") -> None:
     shift_doc = frappe.get_doc("Shift Type", doc.shift)
 
     # If There if only one Checkin or Checkout
-    if (
-        doc.get("actual_start_datetime") is not None
-        and doc.get("actual_end_datetime") is None
-    ) or (
-        doc.get("actual_start_datetime") is None
-        and doc.get("actual_end_datetime") is not None
-    ):
+    if doc.get("forget_fingerprint"):
         if shift_doc.get("custom_consider_only_check_as"):
             doc.set("status", shift_doc.custom_consider_only_check_as)
 
