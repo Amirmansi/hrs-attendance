@@ -72,7 +72,7 @@ class AttendanceCalculation(Document):
         frappe.db.commit()
         self.employees_logs = frappe.db.sql(f"""
 			select log.employee , time(log.time) as time ,log.time as log_time
-			, date(log.time) as day , log.log_type 
+			, date(log.time) as day , log.log_type , log.name as log_name 
 			from `tabEmployee Checkin` log
 			inner join tabEmployee emp on emp.name = log.employee
 			where date(log.time)  
