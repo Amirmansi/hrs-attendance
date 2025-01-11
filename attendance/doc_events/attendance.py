@@ -56,7 +56,7 @@ def validate(doc: AttendanceHRMS, method: str = "") -> None:
                 elif based_on == "Percent":
                     doc.set("deduction", deduction)
 
-        elif out_time < shift_end_time and shift_doc.get("custom_early_exit_policy"):
+        if out_time < shift_end_time and shift_doc.get("custom_early_exit_policy"):
             early_exit_policy_doc: LateEntryEarlyExitTable = frappe.get_doc(
                 "Late Entry Early Exit Table",
                 shift_doc.custom_early_exit_policy,
