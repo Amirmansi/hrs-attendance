@@ -146,6 +146,7 @@ doc_events = {
     },
     "Attendance": {
         "validate": "attendance.doc_events.attendance.validate",
+        "after_insert": "attendance.doc_events.attendance.after_insert",
     },
 }
 

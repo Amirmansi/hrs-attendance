@@ -73,3 +73,19 @@ def validate(doc: AttendanceHRMS, method: str = "") -> None:
                     doc.set("status", deduction)
                 elif based_on == "Percent":
                     doc.set("deduction", deduction)
+
+
+def after_insert(doc: AttendanceHRMS, method: str = "") -> None:
+    if doc.get("logs"):
+        for log in doc.get("logs", default=[]):
+            if log.get("log_name") and (
+                emp_check_in_name := frappe.db.exists(
+                    "Employee Checkin", log.get("log_name")
+                )
+            ):
+                frappe.db.set_value(
+                    "Employee Checkin",
+                    emp_check_in_name,
+                    "attendance",
+                    doc.name,
+                )
