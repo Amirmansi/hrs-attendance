@@ -1,7 +1,6 @@
 # Copyright (c) 2022, Peter MAged and contributors
 # For license information, please see license.txt
 
-from unittest import result
 import frappe
 from frappe import _
 
@@ -20,13 +19,13 @@ def get_columns():
             "label": _("Employee"),
             "fieldtype": "Link",
             "options": "Employee",
-            "width": 250
+            "width": 250,
         },
         {
             "fieldname": "employee_name",
             "label": _("Employee Name"),
             "fieldtype": "Data",
-            "width": 150
+            "width": 150,
         },
         # {
         #     "fieldname": "department",
@@ -56,128 +55,114 @@ def get_columns():
         #     "options": "Designation",
         #     "width": 120
         # },
-
         {
             "fieldname": "attendance_date",
             "label": _("Date"),
             "fieldtype": "Date",
-            "width": 120
+            "width": 120,
         },
-        {
-            "fieldname": "day_name",
-            "label": _("Day"),
-            "fieldtype": "Data",
-            "width": 120
-        },
+        {"fieldname": "day_name", "label": _("Day"), "fieldtype": "Data", "width": 120},
         {
             "fieldname": "status",
             "label": _("Status"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "shift_start",
             "label": _("Shift Start"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "shift_end",
             "label": _("Shift End"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "attend_time",
             "label": _("Check IN"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
-        
         {
             "fieldname": "leave_time",
             "label": _("Check OUT"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
-        
         {
             "fieldname": "fingerprint_type",
             "label": _("Forget Fingerprint"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
-        {
-            "fieldname": "late_in",
-            "label": _("Late"),
-            "fieldtype": "Data",
-            "width": 120
-        },
+        {"fieldname": "late_in", "label": _("Late"), "fieldtype": "Data", "width": 120},
         {
             "fieldname": "less_time",
             "label": _("Less"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "overtime",
             "label": _("Overtime"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "leave_type",
             "label": _("Leave Type"),
             "fieldtype": "Data",
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "shift_hours",
             "label": _("Shift Hours"),
             "fieldtype": "Float",
             "precision": 2,
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "working_hours",
             "label": _("Actual Hours"),
             "fieldtype": "Float",
             "precision": 2,
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "leave_application",
             "label": _("Leave"),
             "fieldtype": "Link",
-            "options":"Leave Application",
+            "options": "Leave Application",
             "precision": 2,
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "overtime_request",
             "label": _("Overtime Request"),
             "fieldtype": "Link",
-            "options":"Daily Overtime request",
+            "options": "Daily Overtime request",
             "precision": 2,
-            "width": 120
+            "width": 120,
         },
         {
             "fieldname": "permission",
             "label": _("Permission"),
             "fieldtype": "Link",
-            "options":"Permission Application",
+            "options": "Permission Application",
             "precision": 2,
-            "width": 120
+            "width": 120,
         },
-
     ]
 
     return columns
 
 
 def get_data(filters):
-	conditions = get_employee_filters(filters or {})
-	sql = f"""
+    conditions = get_employee_filters(filters or {})
+    sql = f"""
 				select 
 						emp.employee_name,
 						log.attendance_date ,
@@ -213,15 +198,18 @@ def get_data(filters):
 				ORDER by emp.name ASC , log.attendance_date asc
 
 	"""
-	# frappe.throw(sql)
-	result = frappe.db.sql(sql,as_dict=1)
-	data = result
-	return data
+    # frappe.throw(sql)
+    result = frappe.db.sql(sql, as_dict=1)
+    data = result
+    return data
+
 
 def get_employee_filters(filters):
-    from_date, to_date = filters.get('from_date'), filters.get('to_date')
+    from_date, to_date = filters.get("from_date"), filters.get("to_date")
 
-    conditions = f" and log.attendance_date Between date('{from_date}') And date('{to_date}') "
+    conditions = (
+        f" and log.attendance_date Between date('{from_date}') And date('{to_date}') "
+    )
     data = filters.get("company")
     if data:
         conditions += f" and emp.company = '{data}' "
