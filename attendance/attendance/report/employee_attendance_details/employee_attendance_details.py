@@ -1,14 +1,19 @@
 # Copyright (c) 2022, Peter MAged and contributors
 # For license information, please see license.txt
 
+from functools import reduce
+from itertools import groupby
+
 import frappe
 from frappe import _
+from frappe.utils import flt
 
 
 def execute(filters=None):
     columns, data = [], []
     columns = get_columns()
     data = get_data(filters)
+    data = group_data_by_employee(data)
     return columns, data
 
 
@@ -189,7 +194,21 @@ def get_data(filters):
 						emp.branch,
 						emp.grade,
 						emp.designation,
-						emp.department
+						emp.department,
+                        emp.attendance_device_id,
+                        emp.passport_number,
+                        EXTRACT(YEAR FROM emp.date_of_joining) as joining_year,
+                        TO_CHAR(emp.date_of_joining, 'Month') AS joining_month,
+                        (
+                            CASE
+                                WHEN log.status = "Present" THEN 1
+                                WHEN log.status = "Half Day" THEN 0.5
+                                WHEN log.status = "Absent" THEN 0
+                                WHEN log.holiday and log.status = "On Leave" THEN "Holiday"
+                                ELSE 0
+                            END
+                        ) AS working_day,
+                        LEAST((log.working_hours / log.shift_hours) * 100, 100) AS work_percentage
 
 				from tabEmployee emp 
 				Inner join tabAttendance  log on log.employee  = emp.name 
@@ -231,3 +250,51 @@ def get_employee_filters(filters):
     if data:
         conditions += f" and emp.department = '{data}' "
     return conditions
+
+
+def group_data_by_employee(data):
+    if not data:
+        return data
+
+    grouped_data = []
+
+    for key, values_iter in groupby(
+        sorted(data, key=lambda i: i.get("employee")),
+        key=lambda i: i.get("employee"),
+    ):
+        values_list = list(values_iter)
+
+        total_hour = reduce(
+            lambda total, i: total + i.get("working_hours"),
+            values_list,
+            0.0,
+        )
+        values_list[0]["total_hour"] = flt(total_hour, precision=2)
+
+        total_present_day = reduce(
+            lambda total, i: total + 1 if i.get("status") == "Present" else total,
+            values_list,
+            0,
+        )
+        total_half_day = reduce(
+            lambda total, i: total + 1 if i.get("status") == "Half Day" else total,
+            values_list,
+            0,
+        )
+        total_absent_day = reduce(
+            lambda total, i: total + 1 if i.get("status") == "Absent" else total,
+            values_list,
+            0,
+        )
+        values_list[0]["total_present_day"] = flt(total_present_day, precision=2)
+        values_list[0]["total_half_day"] = flt(total_half_day, precision=2)
+        values_list[0]["total_absent_day"] = flt(total_absent_day, precision=2)
+        values_list[0]["total_working_day"] = flt(
+            total_present_day + total_half_day, precision=2
+        )
+
+        grouped_data.append(values_list)
+
+    data[0]["grouped_data"] = frappe.as_json(grouped_data)
+
+    return data
