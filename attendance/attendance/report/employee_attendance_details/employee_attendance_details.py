@@ -290,7 +290,7 @@ def group_data_by_employee(data):
         values_list[0]["total_half_day"] = flt(total_half_day, precision=2)
         values_list[0]["total_absent_day"] = flt(total_absent_day, precision=2)
         values_list[0]["total_working_day"] = flt(
-            total_present_day + total_half_day, precision=2
+            total_present_day + (total_half_day / 2), precision=2
         )
 
         grouped_data.append(values_list)

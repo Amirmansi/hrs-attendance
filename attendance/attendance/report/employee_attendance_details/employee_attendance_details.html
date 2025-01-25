@@ -8,6 +8,10 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        @media print {
+            .pagebreak { page-break-before: always; } /* page-break-after works, as well */
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -139,20 +143,22 @@
             <table class="table table-bordered table-striped text-center">
                 <thead style="background-color: #808080;">
                     <tr>
-                        <th style="color: #000;">Date</th>
-                        <th style="color: #ffffff;">Check In</th>
-                        <th style="color: #ffffff;">Check Out</th>
-                        <th style="color: #ffffff;">Working Day</th>
-                        <th style="color: #ffffff;">Chart Hour</th>
+                        <th style="color: #000; text-align: center; font-size: 15px">Date</th>
+                        <th style="color: #000; text-align: center; font-size: 15px">Day</th>
+                        <th style="color: #ffffff; text-align: center; font-size: 15px">Check In</th>
+                        <th style="color: #ffffff; text-align: center; font-size: 15px">Check Out</th>
+                        <th style="color: #ffffff; text-align: center; font-size: 15px">Working Day</th>
+                        <th style="color: #ffffff; text-align: center; font-size: 15px">Chart Hour</th>
                     </tr>
                 </thead>
                 {% for (let data of employee_data) { %}
                 <tbody>
                     <tr>
-                        <td>{{ data.attendance_date }}</td>
-                        <td>{{ data.attend_time }}</td>
-                        <td>{{ data.leave_time }}</td>
-                        <td>{{ data.working_day }}</td>
+                        <td style="text-align: center; font-size: 15px;">{{ data.attendance_date }}</td>
+                        <td style="text-align: center; font-size: 15px;">{{ data.day_name }}</td>
+                        <td style="text-align: center; font-size: 15px;">{{ data.attend_time }}</td>
+                        <td style="text-align: center; font-size: 15px;">{{ data.leave_time }}</td>
+                        <td style="text-align: center; font-size: 15px;">{{ data.working_day }}</td>
                         {% if (data.working_day && data.working_day != "Holiday" && data.working_day != 0) { %}
                         <td>
                             <div class="chart-bar chart-blue" style="width: {{ flt(data.work_percentage, 2) }}%;"></div> {{ flt(data.working_hours, 2) }}
@@ -174,34 +180,34 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th colspan="5" class="text-center" style="color: #000;">Total Attendance Day</th>
-                        <th class="text-center" style="color: #000;">Total Hour</th>
-                        <td class="text-center">{{ employee_data[0].total_hour }}</td>
+                        <th colspan="5" class="text-center" style="color: #000; font-size: 15px;">Total Attendance Day</th>
+                        <th class="text-center" style="color: #000; font-size: 15px;">Total Hour</th>
+                        <td class="text-center" style="font-size: 15px;">{{ employee_data[0].total_hour }}</td>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="2" class="header-cell">Total PRESENT Day</td>
-                        <td colspan="2" class="header-cell">Total Half Day</td>
-                        <td colspan="2" class="header-cell">Total Absent</td>
-                        <td colspan="2" class="header-cell">Total Working Day</td>
+                        <td colspan="2" class="header-cell" style="font-size: 15px;">Total PRESENT Day</td>
+                        <td colspan="2" class="header-cell" style="font-size: 15px;">Total Half Day</td>
+                        <td colspan="2" class="header-cell" style="font-size: 15px;">Total Absent</td>
+                        <td colspan="2" class="header-cell" style="font-size: 15px;">Total Working Day</td>
                     </tr>
                     <tr>
-                        <td colspan="2" class="text-center">{{ employee_data[0].total_present_day }}</td>
-                        <td colspan="2" class="text-center">{{ employee_data[0].total_half_day }}</td>
-                        <td colspan="2" class="text-center">{{ employee_data[0].total_absent_day }}</td>
-                        <td colspan="2" class="text-center">{{ employee_data[0].total_working_day }}</td>
+                        <td colspan="2" class="text-center" style="font-size: 15px;">{{ employee_data[0].total_present_day }}</td>
+                        <td colspan="2" class="text-center" style="font-size: 15px;">{{ employee_data[0].total_half_day }}</td>
+                        <td colspan="2" class="text-center" style="font-size: 15px;">{{ employee_data[0].total_absent_day }}</td>
+                        <td colspan="2" class="text-center" style="font-size: 15px;">{{ employee_data[0].total_working_day }}</td>
                     </tr>
                     <tr>
-                        <td class="notes-section">Notes</td>
+                        <td class="notes-section header-cell">Notes</td>
                         <td colspan="7" class="notes-section"></td>
                     </tr>
                     <tr class="signature-section">
-                        <td colspan="2">Attendance Manager</td>
-                        <td colspan="2">HR Manager</td>
-                        <td colspan="4">Audit Dep.</td>
+                        <td colspan="2" class="header-cell">Attendance Manager</td>
+                        <td colspan="2" class="header-cell">HR Manager</td>
+                        <td colspan="4" class="header-cell">Audit Dep.</td>
                     </tr>
-                    <tr>
+                    <tr class="signature-section">
                         <td colspan="2"></td>
                         <td colspan="2"></td>
                         <td colspan="4"></td>
@@ -211,6 +217,7 @@
         </div>
 
     </div>
+    <div class="pagebreak"> </div>
     {% } %}
     {% } %}
     <!-- Bootstrap JS (Optional) -->
