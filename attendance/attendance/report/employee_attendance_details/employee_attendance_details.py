@@ -286,12 +286,24 @@ def group_data_by_employee(data):
             values_list,
             0,
         )
+        total_holiday = reduce(
+            lambda total, i: total + 1 if i.get("status") == "Holiday" else total,
+            values_list,
+            0,
+        )
+        total_vacation = reduce(
+            lambda total, i: total + 1 if i.get("status") == "On Leave" else total,
+            values_list,
+            0,
+        )
         values_list[0]["total_present_day"] = flt(total_present_day, precision=2)
         values_list[0]["total_half_day"] = flt(total_half_day, precision=2)
         values_list[0]["total_absent_day"] = flt(total_absent_day, precision=2)
         values_list[0]["total_working_day"] = flt(
             total_present_day + (total_half_day / 2), precision=2
         )
+        values_list[0]["total_holiday"] = flt(total_holiday, precision=2)
+        values_list[0]["total_vacation"] = flt(total_vacation, precision=2)
 
         grouped_data.append(values_list)
 
