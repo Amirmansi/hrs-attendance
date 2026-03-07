@@ -1,12 +1,12 @@
 # Copyright (c) 2021, Peter Maged and contributors
 # For license information, please see license.txt
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import frappe
 from babel.dates import format_date
 from dateutil.parser import parse
-from erpnext.setup.doctype.employee.employee import (
+from hrms.hr.doctype.employee.employee import (
     is_holiday,
 )
 from frappe import _
@@ -22,7 +22,7 @@ whitelisted_globals = {
     "float": float,
     "long": int,
     "round": round,
-    "date": datetime.date,
+    "date": date,
     "getdate": getdate,
 }
 

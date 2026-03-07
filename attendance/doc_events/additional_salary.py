@@ -9,11 +9,13 @@ def on_cancel(doc,method='') :
 
 
 def clear_employee_rewards_references(doc):
-    sql = f"""
+    frappe.db.sql(
+        """
         Update `tabEmployee Rewards` set ref_doctype = '' , ref_docname = ''
-        where ref_doctype = '{doc.doctype}' and ref_docname = '{doc.name}'
-    """
-    frappe.db.sql(sql)
+        where ref_doctype = %s and ref_docname = %s
+        """,
+        (doc.doctype, doc.name),
+    )
     frappe.db.commit()
     
 

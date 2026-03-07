@@ -23,29 +23,7 @@ from frappe.utils import (
     rounded,
 )
 from frappe.utils.background_jobs import enqueue
-from six import iteritems
-
-import erpnext
-from erpnext.accounts.utils import get_fiscal_year
-from hrms.hr.utils import get_holiday_dates_for_employee, validate_active_employee
-from lending.loan_management.doctype.loan_repayment.loan_repayment import (
-    calculate_amounts,
-    create_repayment_entry,
-)
 from hrms.payroll.doctype.additional_salary.additional_salary import get_additional_salaries
-from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
-    get_benefit_component_amount,
-)
-from hrms.payroll.doctype.employee_benefit_claim.employee_benefit_claim import (
-    get_benefit_claim_amount,
-    get_last_payroll_period_benefits,
-)
-from hrms.payroll.doctype.payroll_entry.payroll_entry import get_start_end_dates
-from hrms.payroll.doctype.payroll_period.payroll_period import (
-    get_payroll_period,
-    get_period_factor,
-)
-from erpnext.utilities.transaction_base import TransactionBase
 
 
 class AttendanceSalarySlip(SalarySlip):

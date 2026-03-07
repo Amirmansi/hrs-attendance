@@ -71,35 +71,37 @@ def validate_salary_slip(self,fun=''):
     update_salary_slip_remark(self.name)
     for row in self.earnings :
         if getattr(row,'customer',None) :
-            sql = f"""
-            select count(*) from tabAttendance where customer = '{row.customer}' and docstatus = 1
-            and date(attendance_date) between date('{self.start_date}') and  date('{self.end_date}')
-            and employee = '{self.employee}'
-            """
-            res = frappe.db.sql(sql) or []
-            row.no_of_visits = (res [0][0] or 0) if res else 0 
+            res = frappe.db.sql(
+                """
+                select count(*) from tabAttendance
+                where customer = %s and docstatus = 1
+                and date(attendance_date) between date(%s) and date(%s)
+                and employee = %s
+                """,
+                (row.customer, self.start_date, self.end_date, self.employee),
+            ) or []
+            row.no_of_visits = (res[0][0] or 0) if res else 0
 
-            sql =f"""
-                update `tabSalary Detail` s 
-                set s.no_of_visits = '{row.no_of_visits}' 
-                where name = '{row.name}'
-                
-            """
-            frappe.db.sql(sql)
+            frappe.db.sql(
+                """
+                update `tabSalary Detail` s
+                set s.no_of_visits = %s
+                where name = %s
+                """,
+                (row.no_of_visits, row.name),
+            )
             frappe.db.commit()
 
 
 
 def update_salary_slip_remark(name=None):
-        conditions = "where ifnull(s.additional_salary,'') <> '' "
-        if name : 
-            conditions += f" and s.parent = '{name}'"
-
-        sql =f"""
-        update `tabSalary Detail` s 
-        set s.remark = (select t.remark from `tabAdditional Salary` t where t.name = s.additional_salary order by name limit 1 )
-        {conditions} 
+        base_sql = """
+        update `tabSalary Detail` s
+        set s.remark = (select t.remark from `tabAdditional Salary` t where t.name = s.additional_salary order by name limit 1)
+        where ifnull(s.additional_salary,'') <> ''
         """
-        # frappe.msgprint(sql)
-        frappe.db.sql(sql)
+        if name:
+            frappe.db.sql(base_sql + " and s.parent = %s", (name,))
+        else:
+            frappe.db.sql(base_sql)
         frappe.db.commit()
