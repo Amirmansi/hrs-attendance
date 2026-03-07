@@ -13,8 +13,6 @@ from frappe.utils import (
 	nowdate,
 )
 
-from hrms.hr.doctype.employee.employee import get_holiday_list_for_employee
-
 
 class LeaveDayBlockedError(frappe.ValidationError): pass
 class OverlapError(frappe.ValidationError): pass
@@ -25,7 +23,12 @@ from frappe.model.document import Document
 
 
 
-from hrms.hr.doctype.leave_application.leave_application import LeaveApplication
+try:
+	from hrms.hr.doctype.leave_application.leave_application import LeaveApplication
+except ImportError:
+	# Fallback when HRMS is not yet installed (e.g., during app installation).
+	# Full functionality requires HRMS to be installed.
+	LeaveApplication = Document
 
 class AttendanceLeaveApplication(LeaveApplication):
 	def update_attendance(self):
@@ -261,6 +264,7 @@ def get_leave_entries(employee, leave_type, from_date, to_date):
 def get_holidays(employee, from_date, to_date, holiday_list = None):
 	'''get holidays between two dates for the given employee'''
 	if not holiday_list:
+		from hrms.hr.doctype.employee.employee import get_holiday_list_for_employee
 		holiday_list = get_holiday_list_for_employee(employee)
 
 	holidays = frappe.db.sql("""select count(distinct holiday_date) from `tabHoliday` h1, `tabHoliday List` h2
@@ -382,6 +386,7 @@ def add_block_dates(events, start, end, employee, company):
 		cnt+=1
 
 def add_holidays(events, start, end, employee, company):
+	from hrms.hr.doctype.employee.employee import get_holiday_list_for_employee
 	applicable_holiday_list = get_holiday_list_for_employee(employee, company)
 	if not applicable_holiday_list:
 		return

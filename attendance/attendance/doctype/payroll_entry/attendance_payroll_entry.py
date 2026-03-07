@@ -24,7 +24,6 @@ from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
     get_accounting_dimensions,
 )
 from erpnext.accounts.utils import get_fiscal_year
-from hrms.hr.doctype.employee.employee import get_holiday_list_for_employee
 
 
 class PayrollEntry(Document):
@@ -829,6 +828,7 @@ class PayrollEntry(Document):
 		return employees_to_mark_attendance
 
 	def get_count_holidays_of_employee(self, employee, start_date):
+		from hrms.hr.doctype.employee.employee import get_holiday_list_for_employee
 		holiday_list = get_holiday_list_for_employee(employee)
 		holidays = 0
 		if holiday_list:
