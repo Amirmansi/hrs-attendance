@@ -6,16 +6,10 @@ from datetime import date, datetime, timedelta
 import frappe
 from babel.dates import format_date
 from dateutil.parser import parse
-from hrms.hr.doctype.employee.employee import (
-    is_holiday,
-)
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_days, get_link_to_form, get_time, nowdate, to_timedelta
 from frappe.utils.data import flt, getdate
-from hrms.hr.doctype.leave_application.leave_application import (
-    get_leave_balance_on,
-)
 
 whitelisted_globals = {
     "int": int,
@@ -222,6 +216,7 @@ class AttendanceCalculation(Document):
                 )
             )
 
+        from hrms.hr.doctype.employee.employee import is_holiday
         holiday = is_holiday(employee=employee.name, date=day)
         doc.holiday = holiday
         doc.employee = employee.name
@@ -1537,6 +1532,7 @@ class AttendanceCalculation(Document):
             frappe.msgprint(_(str(e)))
 
     def check_leave_balance(self, employee, leave_type, days):
+        from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
         leave_balance = get_leave_balance_on(
             employee,
             leave_type,

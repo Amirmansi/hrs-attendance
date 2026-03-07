@@ -7,13 +7,11 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_days, date_diff, getdate
 
-from hrms.hr.doctype.employee.employee import is_holiday
-from hrms.hr.utils import validate_active_employee
-
 
 class AttendanceRequest(Document):
     def validate(self):
         # frappe.msgprint('sss')
+        from hrms.hr.utils import validate_active_employee
         validate_active_employee(self.employee)
         validate_dates(self, self.from_date, self.to_date)
         if self.half_day:
@@ -55,6 +53,7 @@ class AttendanceRequest(Document):
 
     def validate_if_attendance_not_applicable(self, attendance_date):
         # Check if attendance_date is a Holiday
+        from hrms.hr.doctype.employee.employee import is_holiday
         if is_holiday(self.employee, attendance_date):
             frappe.msgprint(
                 _("Attendance not submitted for {0} as it is a Holiday.").format(attendance_date), alert=1
