@@ -10,7 +10,6 @@ import frappe
 from frappe import _, bold
 from frappe.model.document import Document
 from frappe.utils import date_diff, flt, formatdate, get_last_day, get_link_to_form, getdate
-from six import string_types
 
 
 class LeavePolicyAssignment(Document):
@@ -168,7 +167,7 @@ class LeavePolicyAssignment(Document):
 	def get_leaves_for_passed_months(
 		self, leave_type, new_leaves_allocated, leave_type_details, date_of_joining
 	):
-		from erpnext.hr.utils import get_monthly_earned_leave
+		from hrms.hr.utils import get_monthly_earned_leave
 
 		current_date = frappe.flags.current_date or getdate()
 		if current_date > getdate(self.effective_to):
@@ -222,10 +221,10 @@ def add_current_month_if_applicable(months_passed, date_of_joining, based_on_doj
 @frappe.whitelist()
 def create_assignment_for_multiple_employees(employees, data):
 
-	if isinstance(employees, string_types):
+	if isinstance(employees, str):
 		employees = json.loads(employees)
 
-	if isinstance(data, string_types):
+	if isinstance(data, str):
 		data = frappe._dict(json.loads(data))
 
 	docs_name = []
