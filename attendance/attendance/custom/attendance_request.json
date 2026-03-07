@@ -12,15 +12,6 @@
     },
     {
       "dt": "Attendance Request",
-      "fieldname": "shift",
-      "fieldtype": "Link",
-      "label": "Shift",
-      "insert_after": "customer",
-      "options": "Shift Type",
-      "idx": 17
-    },
-    {
-      "dt": "Attendance Request",
       "fieldname": "section_break_9",
       "fieldtype": "Section Break",
       "insert_after": "half_day_date",
