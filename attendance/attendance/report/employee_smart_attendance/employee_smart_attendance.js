@@ -3,6 +3,30 @@
 /* eslint-disable */
 
 frappe.query_reports["Employee Smart Attendance"] = {
+  onload: function () {
+    frappe.dom.set_style(`
+      /* Smart Attendance Report – custom styles */
+      .dt-row .dt-cell[data-col-index] { vertical-align: middle; }
+
+      /* Bold column headers */
+      .dt-header .dt-cell__content { font-weight: 700 !important; }
+
+      /* Highlight Actual / Expected / Variance columns */
+      [data-fieldname="actual_hours"] .dt-cell__content,
+      [data-fieldname="expected_hours"] .dt-cell__content,
+      [data-fieldname="variance"] .dt-cell__content {
+        font-family: monospace;
+        letter-spacing: 0.02em;
+      }
+
+      /* Status pill colours */
+      .indicator-pill.green  { background: #d4edda; color: #155724; border-radius: 12px; padding: 2px 10px; }
+      .indicator-pill.orange { background: #fff3cd; color: #856404; border-radius: 12px; padding: 2px 10px; }
+      .indicator-pill.yellow { background: #e8d5f5; color: #6f42c1; border-radius: 12px; padding: 2px 10px; }
+      .indicator-pill.red    { background: #f8d7da; color: #721c24; border-radius: 12px; padding: 2px 10px; }
+    `);
+  },
+
   filters: [
     {
       fieldname: "company",

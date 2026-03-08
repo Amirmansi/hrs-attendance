@@ -270,7 +270,7 @@ def _build_expected_hours_map(employees):
     """Build a dict mapping employee -> expected working hours per day.
 
     Priority:
-    1. Employee.default_shift → Shift Type.duration (hours)
+    1. Employee.default_shift → Shift Type.working_hours (hours, ERPNext v15)
     2. Employee.attendance_rule → Attendance Rule.working_hours_per_day
     """
     expected = {}
@@ -283,7 +283,7 @@ def _build_expected_hours_map(employees):
     if shifts:
         shift_data = frappe.db.sql(
             """
-            SELECT name, duration
+            SELECT name, working_hours
             FROM `tabShift Type`
             WHERE name IN %(shifts)s
             """,
@@ -291,8 +291,8 @@ def _build_expected_hours_map(employees):
             as_dict=1,
         )
         for s in shift_data:
-            # duration in Shift Type is stored in minutes in ERPNext v15
-            shift_hours[s.name] = flt(s.duration or 0) / 60.0
+            # working_hours in ERPNext v15 Shift Type is stored in hours
+            shift_hours[s.name] = flt(s.working_hours or 0)
 
     rule_hours = {}
     if rules:
