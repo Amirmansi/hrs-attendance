@@ -52,14 +52,6 @@
   "overtime_rule_section",
   "enable_overtime",
   "overtime_depend_on_requests_only",
-  "overtime_holiday_factor",
-  "overtime_weekend_factor",
-  "overtime_maximum_per_day",
-  "column_break_18",
-  "holiday_overtime_salary_component",
-  "weekend_overtime_salary_component",
-  "normal_overtime_salary_component",
-  "overtime_maximum_per_month",
   "section_break_31",
   "overtime_rules",
   "fingerprint_penalty_section",
@@ -181,56 +173,11 @@
    "options": "Overtime Rule"
   },
   {
-   "fieldname": "overtime_holiday_factor",
-   "fieldtype": "Float",
-   "label": "Overtime Holiday Factor (Hours)",
-   "mandatory_depends_on": "eval:doc.enable_overtime==1"
-  },
-  {
-   "fieldname": "overtime_weekend_factor",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Overtime Weekend Factor (Hours)"
-  },
-  {
-   "fieldname": "overtime_maximum_per_day",
-   "fieldtype": "Float",
-   "label": "Overtime Maximum Per Day (Hours)",
-   "mandatory_depends_on": "eval:doc.enable_overtime==1"
-  },
-  {
-   "fieldname": "overtime_maximum_per_month",
-   "fieldtype": "Float",
-   "label": "Overtime Maximum Per Month (Hours)",
-   "mandatory_depends_on": "eval:doc.enable_overtime==1"
-  },
-  {
    "depends_on": "eval:doc.enable_permission == 1",
    "fieldname": "request_period",
    "fieldtype": "Time",
    "label": "Request Period",
    "mandatory_depends_on": "eval:doc.enable_permission == 1"
-  },
-  {
-   "fieldname": "normal_overtime_salary_component",
-   "fieldtype": "Link",
-   "label": "Normal Overtime Salary Component",
-   "mandatory_depends_on": "eval:doc.enable_overtime==1",
-   "options": "Salary Component"
-  },
-  {
-   "fieldname": "weekend_overtime_salary_component",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Weekend Overtime Salary Component",
-   "options": "Salary Component"
-  },
-  {
-   "fieldname": "holiday_overtime_salary_component",
-   "fieldtype": "Link",
-   "label": "Holiday Overtime Salary Component",
-   "mandatory_depends_on": "eval:doc.enable_overtime==1",
-   "options": "Salary Component"
   },
   {
    "fieldname": "fingerprint_penalty_section",
@@ -258,10 +205,6 @@
   },
   {
    "fieldname": "column_break_5",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_18",
    "fieldtype": "Column Break"
   },
   {

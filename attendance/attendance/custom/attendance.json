@@ -1160,7 +1160,7 @@
    "fetch_from": null,
    "fetch_if_empty": 0,
    "fieldname": "overtime_factor",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,

@@ -755,21 +755,32 @@ class AttendanceCalculation(Document):
             return doc
         if doc.overtime > timedelta(minutes=0) and doc.attendance_rule.enable_overtime:
             overtime_factor = 0
-            if not doc.holiday:
-                overtime_minutes = (
-                    (doc.overtime.seconds / 60)
-                    if doc.attendance_rule.overtime_maximum_per_day
-                    >= (doc.overtime.seconds / 3600)
-                    else doc.attendance_rule.overtime_maximum_per_day * 60
-                )
-                doc.early_exit = 0
+            # Determine the day of week for the attendance date
+            day_of_week = doc.attendance_date.strftime("%A")  # e.g. "Monday"
+
+            # Find the matching overtime rule row for this day
+            day_rule = None
+            for row in doc.attendance_rule.overtime_rules:
+                if row.day_of_week == day_of_week:
+                    day_rule = row
+                    break
+
+            # If no specific rule found for the day, try any off-day rule on holidays
+            if day_rule is None and doc.holiday:
                 for row in doc.attendance_rule.overtime_rules:
-                    if row.from_min <= overtime_minutes <= row.to_min:
-                        overtime_factor = row.factor * overtime_minutes
-            else:
-                overtime_factor = (
-                    doc.overtime.seconds / 60
-                ) * doc.attendance_rule.overtime_holiday_factor
+                    if row.is_off_day:
+                        day_rule = row
+                        break
+
+            if day_rule:
+                actual_overtime_hours = doc.overtime.seconds / 3600
+                max_hours = day_rule.max_overtime_hours or 0
+                capped_hours = (
+                    min(actual_overtime_hours, max_hours) if max_hours > 0 else actual_overtime_hours
+                )
+                overtime_factor = capped_hours * (day_rule.hour_rate or 0)
+                doc.early_exit = 0
+
             doc.overtime_factor = overtime_factor
 
         return doc
@@ -953,6 +964,34 @@ class AttendanceCalculation(Document):
 			"""
         attendances = frappe.db.sql(sql, as_dict=1) or []
 
+        # Pre-fetch per-day overtime records for all employees to avoid N+1 queries
+        overtime_days_all = (
+            frappe.db.sql(
+                f"""
+                SELECT
+                    log.employee,
+                    log.attendance_date,
+                    log.overtime_factor,
+                    log.holiday,
+                    DAYNAME(log.attendance_date) AS day_of_week
+                FROM tabAttendance log
+                INNER JOIN tabEmployee emp ON emp.name = log.employee
+                WHERE log.docstatus = 1
+                  AND log.overtime_factor > 0
+                  AND DATE(log.attendance_date)
+                      BETWEEN date('{self.payroll_start_date}') AND date('{self.payroll_end_date}')
+                  {employee_filters}
+                ORDER BY log.employee, log.attendance_date ASC
+                """,
+                as_dict=1,
+            )
+            or []
+        )
+        # Group pre-fetched overtime days by employee
+        overtime_days_by_employee = {}
+        for ot in overtime_days_all:
+            overtime_days_by_employee.setdefault(ot.employee, []).append(ot)
+
         count = 1
         total = len(attendances)
         # frappe.msgprint(str(total))
@@ -1010,61 +1049,71 @@ class AttendanceCalculation(Document):
                     )
                     hour_rate = day_rate / (attendance_rule.working_hours_per_day)
 
-                # Normal Overtime
+                # Overtime – per-day processing
                 if attendance_rule.enable_overtime:
                     if attendance_rule.working_type in ["Monthly Target Hour"]:
+                        # Monthly-target: excess hours across the whole period
                         total_working_hours = log.working_hours or 0
                         target_hours = attendance_rule.working_days_per_month or 0
-                        log.normal_overtime = 0
                         if total_working_hours > target_hours:
-                            overtime_factor = 0
-                            overtime_minutes = (total_working_hours - target_hours) / 60
-                            for row in attendance_rule.overtime_rules:
-                                if row.from_min <= overtime_minutes <= row.to_min:
-                                    overtime_factor = row.factor
-
-                            log.normal_overtime = overtime_minutes * overtime_factor
-
-                    if log.normal_overtime:
-                        overtime = (
-                            (log.normal_overtime / 60)
-                            if attendance_rule.overtime_maximum_per_month
-                            >= (log.normal_overtime / 60)
-                            else attendance_rule.overtime_maximum_per_month
-                        )
-                        amount = overtime * hour_rate
-                        salary_component = (
-                            attendance_rule.normal_overtime_salary_component
-                        )
-                        mark = "normal overtime"
-                        remark = f"Normal Overtime : {overtime} Hours"
-                        salary_component_type = "Earning"
-                        if amount and salary_component:
-                            self.submit_additional_salary(
-                                employee,
-                                amount,
-                                salary_component,
-                                salary_component_type,
-                                remark,
-                                mark,
+                            excess_hours = total_working_hours - target_hours
+                            # Use the first rule as a default for monthly target
+                            default_rule = (
+                                attendance_rule.overtime_rules[0]
+                                if attendance_rule.overtime_rules
+                                else None
                             )
-
-                    # Holiday Overtime
-                    if log.holiday_overtime:
-                        overtime = log.holiday_overtime / 60
-                        amount = overtime * hour_rate
-                        salary_component = (
-                            attendance_rule.holiday_overtime_salary_component
-                        )
-                        mark = "Holiday overtime"
-                        remark = f"Holiday Overtime : {overtime} Hours"
-                        salary_component_type = "Earning"
-                        if amount and salary_component:
+                            if default_rule and default_rule.overtime_salary_component:
+                                amount = excess_hours * (default_rule.hour_rate or 0)
+                                remark = f"Monthly Overtime : {excess_hours:.2f} Hours"
+                                if amount:
+                                    self.submit_additional_salary(
+                                        employee,
+                                        amount,
+                                        default_rule.overtime_salary_component,
+                                        "Earning",
+                                        remark,
+                                        "normal overtime",
+                                    )
+                    else:
+                        # Normal / Daily-target: create one Additional Salary per day
+                        overtime_days = overtime_days_by_employee.get(log.employee, [])
+                        for ot_day in overtime_days:
+                            # Find the matching rule for this day of week
+                            day_rule = None
+                            for rule_row in attendance_rule.overtime_rules:
+                                if rule_row.day_of_week == ot_day.day_of_week:
+                                    day_rule = rule_row
+                                    break
+                            # Fallback: on a holiday, use any off-day rule
+                            if day_rule is None and ot_day.holiday:
+                                for rule_row in attendance_rule.overtime_rules:
+                                    if rule_row.is_off_day:
+                                        day_rule = rule_row
+                                        break
+                            if not day_rule or not day_rule.overtime_salary_component:
+                                continue
+                            amount = ot_day.overtime_factor or 0
+                            if not amount:
+                                continue
+                            # Back-calculate hours from stored amount (amount = capped_hours * hour_rate)
+                            overtime_hours = (
+                                round(amount / day_rule.hour_rate, 2)
+                                if day_rule.hour_rate and day_rule.hour_rate > 0
+                                else 0
+                            )
+                            date_str = str(ot_day.attendance_date)
+                            day_name = ot_day.day_of_week
+                            remark = (
+                                f"Overtime: {date_str} ({day_name})"
+                                f" - {overtime_hours:.2f} Hours"
+                            )
+                            mark = f"overtime_{date_str}"
                             self.submit_additional_salary(
                                 employee,
                                 amount,
-                                salary_component,
-                                salary_component_type,
+                                day_rule.overtime_salary_component,
+                                "Earning",
                                 remark,
                                 mark,
                             )
