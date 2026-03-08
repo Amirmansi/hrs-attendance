@@ -16,8 +16,11 @@ from babel.dates import format_date
 class EmployeeRewards(Document):
     def validate(self):
         if (self.based_on == "Days"):
-            calculate_amount_based_on_formula = frappe.db.get_single_value(
-                "Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+            try:
+                calculate_amount_based_on_formula = frappe.db.get_single_value(
+                    "Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+            except Exception:
+                calculate_amount_based_on_formula = 0
             if not calculate_amount_based_on_formula:
                 total_salary = get_employee_salary(frappe._dict({
                     'name': self.employee,

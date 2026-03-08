@@ -29,8 +29,11 @@ from hrms.payroll.doctype.additional_salary.additional_salary import get_additio
 class AttendanceSalarySlip(SalarySlip):
 
     def add_additional_salary_components(self, component_type):
-        calculate_amount_based_on_formula = frappe.db.get_single_value(
-            "Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+        try:
+            calculate_amount_based_on_formula = frappe.db.get_single_value(
+                "Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+        except Exception:
+            calculate_amount_based_on_formula = 0
         if not calculate_amount_based_on_formula:
             return super(AttendanceSalarySlip, self).add_additional_salary_components(component_type)
         else:

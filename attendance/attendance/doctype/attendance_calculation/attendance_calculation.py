@@ -958,6 +958,13 @@ class AttendanceCalculation(Document):
         # frappe.msgprint(str(total))
         for log in attendances:
             employee = frappe.get_doc("Employee", log.employee)
+            if not employee.attendance_rule:
+                frappe.throw(
+                    _(
+                        f"Employee {employee.employee_name} ({employee.name}) does not have an Attendance Rule assigned. "
+                        "Please assign an Attendance Rule to the employee before posting attendance."
+                    )
+                )
             attendance_rule = frappe.get_doc(
                 "Attendance Rule", employee.attendance_rule
             )
@@ -980,10 +987,13 @@ class AttendanceCalculation(Document):
                 # frappe.msgprint('str(day_rate)')
                 day_rate = 1
                 hour_rate = 1
-                calculate_amount_based_on_formula = frappe.db.get_single_value(
-                    "Payroll Settings",
-                    "calculate_amount_based_on_formula_on_additional_salary",
-                )
+                try:
+                    calculate_amount_based_on_formula = frappe.db.get_single_value(
+                        "Payroll Settings",
+                        "calculate_amount_based_on_formula_on_additional_salary",
+                    )
+                except Exception:
+                    calculate_amount_based_on_formula = 0
                 if not calculate_amount_based_on_formula:
                     total_hourly_salary = get_employee_salary(
                         employee, self.payroll_effect_date

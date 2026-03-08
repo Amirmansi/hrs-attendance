@@ -60,8 +60,11 @@ class HourlyLeave(Document):
 		total_days = 30
 		total_hours = 8
 		employee = frappe.get_doc("Employee",self.employee)
-		calculate_amount_based_on_formula = frappe.db.get_single_value(
-				"Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+		try:
+			calculate_amount_based_on_formula = frappe.db.get_single_value(
+					"Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+		except Exception:
+			calculate_amount_based_on_formula = 0
 		if employee.attendance_rule :
 			total_days,total_hours = frappe.db.get_value("Attendance Rule",employee.attendance_rule,["working_days_per_month" , "working_hours_per_day"])
 			total_days = total_days or 30
