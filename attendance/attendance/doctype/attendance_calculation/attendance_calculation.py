@@ -39,14 +39,72 @@ class AttendanceCalculation(Document):
     def validate_dates(self):
         self.start_date = parse(str(self.start_date)).date()
         self.end_date = parse(str(self.end_date)).date()
-        self.payroll_start_date = parse(str(self.payroll_start_date)).date()
-        self.payroll_end_date = parse(str(self.payroll_end_date)).date()
+        if self.payroll_start_date:
+            self.payroll_start_date = parse(str(self.payroll_start_date)).date()
+        if self.payroll_end_date:
+            self.payroll_end_date = parse(str(self.payroll_end_date)).date()
 
-        if not (self.payroll_start_date <= self.start_date <= self.payroll_end_date):
-            frappe.throw(_("Start Date is Not in Payroll Period Date Range"))
+        if self.payroll_start_date and self.payroll_end_date:
+            if not (self.payroll_start_date <= self.start_date <= self.payroll_end_date):
+                frappe.throw(_("Start Date is Not in Payroll Period Date Range"))
 
-        if not (self.payroll_start_date <= self.end_date <= self.payroll_end_date):
-            frappe.throw(_("End Date is Not in Payroll Period Date Range"))
+            if not (self.payroll_start_date <= self.end_date <= self.payroll_end_date):
+                frappe.throw(_("End Date is Not in Payroll Period Date Range"))
+
+    @frappe.whitelist()
+    def fetch_checkin_logs(self):
+        """Fetch Employee Checkin logs for the selected employee between start_date and end_date,
+        clear the existing checkin_logs child table, and repopulate it with the fetched records."""
+        if not self.employee:
+            frappe.throw(_("Please select an Employee before fetching checkin logs."))
+        if not self.start_date:
+            frappe.throw(_("Please set a Start Date before fetching checkin logs."))
+        if not self.end_date:
+            frappe.throw(_("Please set an End Date before fetching checkin logs."))
+
+        start_date = parse(str(self.start_date)).date()
+        end_date = parse(str(self.end_date)).date()
+
+        logs = frappe.db.sql(
+            """
+            SELECT
+                name AS employee_checkin,
+                time,
+                log_type,
+                device_id
+            FROM `tabEmployee Checkin`
+            WHERE employee = %(employee)s
+              AND DATE(time) BETWEEN %(start_date)s AND %(end_date)s
+            ORDER BY time ASC
+            """,
+            {
+                "employee": self.employee,
+                "start_date": start_date,
+                "end_date": end_date,
+            },
+            as_dict=1,
+        )
+
+        self.set("checkin_logs", [])
+        for log in logs:
+            self.append(
+                "checkin_logs",
+                {
+                    "employee_checkin": log.employee_checkin,
+                    "time": log.time,
+                    "log_type": log.log_type,
+                    "device_id": log.device_id,
+                },
+            )
+
+        self.save()
+        frappe.msgprint(
+            _("{0} checkin log(s) fetched and saved for employee {1}.").format(
+                len(logs), self.employee
+            ),
+            title=_("Checkin Logs Fetched"),
+            indicator="green",
+        )
 
     @frappe.whitelist()
     def calculate_attendance(self):
