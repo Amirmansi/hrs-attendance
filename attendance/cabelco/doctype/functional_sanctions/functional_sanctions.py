@@ -28,8 +28,11 @@ class Functionalsanctions(Document):
 			total_days = frappe.db.get_value("Attendance Rule",employee.attendance_rule,"working_days_per_month") or 30
 		for row in getattr(self,'functional_sanctions',[]):
 
-			calculate_amount_based_on_formula = frappe.db.get_single_value(
-				"Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+			try:
+				calculate_amount_based_on_formula = frappe.db.get_single_value(
+					"Payroll Settings", "calculate_amount_based_on_formula_on_additional_salary")
+			except Exception:
+				calculate_amount_based_on_formula = 0
 			if not calculate_amount_based_on_formula:
 				total_salary = get_employee_salary(employee,row.date_ref or date.today())
 				day_rate = total_salary / total_days
