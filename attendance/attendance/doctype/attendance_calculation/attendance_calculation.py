@@ -604,10 +604,22 @@ class AttendanceCalculation(Document):
             doc.permission = doc.permissions[-1].name
         if doc.actual_start_datetime == doc.actual_end_datetime:
             doc = self.forget_fingerpenalty(doc)
-        doc.attend_time, doc.leave_time = (
-            doc.actual_start_datetime.time(),
-            doc.actual_end_datetime.time(),
-        )
+
+        # Assign attend_time (IN) and leave_time (OUT) based on log_type so that
+        # IN fingerprints map to attend_time and OUT fingerprints map to leave_time.
+        if doc.has_logs:
+            in_logs, out_logs = [], []
+            for x in doc.logs:
+                (in_logs if x.log_type == "IN" else out_logs).append(x)
+            doc.attend_time = (
+                in_logs[0].log_time if in_logs else doc.logs[0].log_time
+            ).time()
+            doc.leave_time = (
+                out_logs[-1].log_time if out_logs else doc.logs[-1].log_time
+            ).time()
+        else:
+            doc.attend_time = doc.actual_start_datetime.time()
+            doc.leave_time = doc.actual_end_datetime.time()
 
         doc.working_hours = (
             doc.actual_end_datetime - doc.actual_start_datetime
@@ -618,6 +630,19 @@ class AttendanceCalculation(Document):
             doc.shift_hours = (
                 doc.shift_end_datetime - doc.shift_start_datetime
             ).seconds / 3600  # in Hours
+
+        # Auto-detect Half Day: when using daily-target-hour mode, if actual effective
+        # working hours (including approved permissions) are less than half the expected
+        # daily hours, mark the record as Half Day instead of Present.
+        if doc.daily_target_hour and not half_day and doc.status == "Present" and doc.shift_hours > 0:
+            effective_hours = (
+                doc.working_hours
+                + (permission_in_minutes + permission_out_minutes) / 60
+            )
+            if 0 < effective_hours < doc.shift_hours / 2:
+                doc.status = "Half Day"
+                half_day = True
+                doc.half_day_type = doc.half_day_type or "Morning"
 
         doc.early_in = doc.shift_start_datetime - doc.actual_start_datetime
         doc.late_in = (
