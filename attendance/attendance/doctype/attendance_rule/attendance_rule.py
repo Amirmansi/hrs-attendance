@@ -38,8 +38,9 @@ class AttendanceRule(Document):
 
 	def validate_overtime_rule(self):
 		if self.enable_overtime:
-			if not self.normal_overtime_salary_component:
-				frappe.throw(_("Normal Overtime Salary Component is required when Overtime Rule is enabled."))
+			for row in self.overtime_rules or []:
+				if not row.overtime_salary_component:
+					frappe.throw(_("Overtime Salary Component is required in Overtime Rules row {0}.").format(row.idx))
 
 	def validate_absent_rule(self):
 		if self.enable_absent:
