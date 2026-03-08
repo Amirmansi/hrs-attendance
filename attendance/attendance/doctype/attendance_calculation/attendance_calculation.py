@@ -236,7 +236,15 @@ class AttendanceCalculation(Document):
         employee = frappe.get_doc("Employee", emp)
         count = self.employees.index(emp) + 1
         total = len(self.employees)
-        attendance_rule = frappe.get_doc("Attendance Rule", employee.attendance_rule)
+        if not employee.attendance_rule:
+            frappe.msgprint(
+                _("No Attendance Rule set for Employee {0}. Skipping.").format(
+                    employee.employee_name
+                ),
+                indicator="orange",
+            )
+            return
+        attendance_rule = frappe.get_cached_doc("Attendance Rule", employee.attendance_rule)
         while day <= self.end_date:
             frappe.publish_realtime(
                 "attendance_calculation_progress",
@@ -274,11 +282,28 @@ class AttendanceCalculation(Document):
         )
 
         if not shift:
-            frappe.throw(
-                _(
-                    f"Please Assign Shift to Employee {employee.employee_name} for day {day}"
-                )
+            # Fallback: build a full-day synthetic shift window from the Attendance Rule.
+            # attendance_rule is guaranteed non-None by calculate() before reaching here.
+            # This ensures all check-in logs for the day are captured and that
+            # attendance status is determined by total worked hours (hours-based logic).
+            working_hours = flt(attendance_rule.working_hours_per_day or 8)
+            day_start = datetime.combine(day, datetime.min.time())
+            shift = frappe._dict(
+                {
+                    "shift_type": frappe._dict(
+                        {
+                            "name": None,
+                            "start_time": timedelta(hours=0),
+                            "end_time": timedelta(hours=working_hours),
+                        }
+                    ),
+                    "start_datetime": day_start,
+                    "end_datetime": day_start + timedelta(hours=working_hours),
+                    "actual_start": day_start,
+                    "actual_end": day_start + timedelta(days=1),
+                }
             )
+            doc.use_rule_hours = True
 
         holiday = is_holiday(employee=employee.name, date=day)
         doc.holiday = holiday
@@ -452,7 +477,9 @@ class AttendanceCalculation(Document):
     def calculate_in_out(self, doc):
         # doc.has_logs or doc.has_overtime or  doc.has_visit
         half_day = doc.status == "Half Day"
-        doc.daily_target_hour = (
+        # Force hours-based (daily target) logic when no shift is assigned and we are
+        # using the Attendance Rule fallback, regardless of the rule's working_type.
+        doc.daily_target_hour = doc.get("use_rule_hours") or (
             doc.attendance_rule
             and doc.attendance_rule.working_type in ["Daily Target Hour"]
         )
