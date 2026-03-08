@@ -26,7 +26,10 @@
   "designation",
   "grade",
   "project",
-  "cost_center"
+  "cost_center",
+  "checkin_logs_section",
+  "fetch_checkin_logs",
+  "checkin_logs"
  ],
  "fields": [
   {
@@ -148,6 +151,22 @@
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center"
+  },
+  {
+   "fieldname": "checkin_logs_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Checkin Logs"
+  },
+  {
+   "fieldname": "fetch_checkin_logs",
+   "fieldtype": "Button",
+   "label": "Fetch Checkin Logs"
+  },
+  {
+   "fieldname": "checkin_logs",
+   "fieldtype": "Table",
+   "label": "Checkin Logs",
+   "options": "Attendance Checkin Detail"
   }
  ],
  "index_web_pages_for_search": 1,

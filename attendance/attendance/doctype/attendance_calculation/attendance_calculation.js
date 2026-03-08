@@ -42,4 +42,16 @@ frappe.ui.form.on("Attendance Calculation", {
       },
     });
   },
+
+  fetch_checkin_logs(frm) {
+    frappe.call({
+      method: "fetch_checkin_logs",
+      doc: frm.doc,
+      freeze: 1,
+      freeze_message: __("Fetching Checkin Logs..."),
+      callback: function (r) {
+        frm.refresh();
+      },
+    });
+  },
 });
