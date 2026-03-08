@@ -25,12 +25,6 @@ def get_columns():
             "width": 130,
         },
         {
-            "fieldname": "employee_name",
-            "label": _("Name"),
-            "fieldtype": "Data",
-            "width": 160,
-        },
-        {
             "fieldname": "department",
             "label": _("Department"),
             "fieldtype": "Link",
